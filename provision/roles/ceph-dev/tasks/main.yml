@@ -1,0 +1,5 @@
+---
+- name: Install Ceph dev
+  apt:
+    name: librados-dev
+    state: latest
