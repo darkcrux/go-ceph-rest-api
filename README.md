@@ -2,6 +2,14 @@
 
 Our pathetic attempt to port the Ceph API to go.
 
+## Initialize submodule ceph-ansible
+
+After cloning, run
+```
+$ git submodule init
+$ git submodule update
+```
+
 ## Setup Workspace
 
 We need access to ceph and the ceph-dev libraries to work with this. Boot up the vagrant box to start the workspace.
