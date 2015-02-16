@@ -1,5 +1,7 @@
 # go-ceph-rest-api
 
+[![Join the chat at https://gitter.im/darkcrux/go-ceph-rest-api](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/darkcrux/go-ceph-rest-api?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Our pathetic attempt to port the Ceph API to go.
 
 ## Initialize submodule ceph-ansible
