@@ -9,7 +9,21 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var ceph *grados.Cluster
+const (
+	apiVersion = "0.1"
+)
+
+var (
+	ceph *grados.Cluster
+
+	uriRoot = "/api/v" + apiVersion
+
+	// using a map for routes and functions...
+	// this may change if it doesn't work for other impl.
+	routes = map[string]func(res http.ResponseWriter, req *http.Request){
+		uriRoot + "/fsid": fsidHandler,
+	}
+)
 
 func main() {
 	// create connection to grados
@@ -18,16 +32,16 @@ func main() {
 		log.Fatalln("Ceph Cluster Error:", err)
 	} else {
 		ceph = cluster
+		log.Println("Connected to Ceph.")
 	}
 
-	log.Println("ceph connection started")
-
+	// adding the routes
 	r := mux.NewRouter()
-	r.HandleFunc("/fsid", fsidHandler)
-
+	for k, v := range routes {
+		r.HandleFunc(k, v)
+	}
 	http.Handle("/", r)
 
 	log.Println("ceph api started.")
-
-	http.ListenAndServe("0.0.0.0:9000", nil)
+	log.Fatal(http.ListenAndServe("0.0.0.0:9000", nil))
 }
