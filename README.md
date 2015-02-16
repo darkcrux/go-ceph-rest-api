@@ -42,7 +42,7 @@ $ sudo ./go-ceph-rest-api
 Once running, the API should be accessible via port 9000 (Needs to be updated).
 
 ```
-$ curl http://200.200.200.200:9000/fsid
+$ curl http://200.200.200.200:9000/api/v0.1/fsid
 ```
 
 ## Notes
