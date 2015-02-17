@@ -4,11 +4,31 @@ import (
   "fmt"
   "net/http"
   "github.com/gorilla/mux"
+  "encoding/json"
+)
+
+const (
+  // actions
+  create = "create"
+  // get = "get"
+  // delete = "delete"
+
+  // methods
+  // get = "GET"
+  // post = "POST"
+  put = "PUT"
+  // delete = "DELETE"
 )
 
 type PoolAPI struct {
   Res http.ResponseWriter
   Req *http.Request
+  Params map[string]string
+}
+
+type Response struct {
+  Status string      `json:"status"`
+  Output interface{} `json:"output"`
 }
 
 func poolHandler(res http.ResponseWriter, req *http.Request) {
@@ -16,26 +36,32 @@ func poolHandler(res http.ResponseWriter, req *http.Request) {
   var pool PoolAPI
   pool.Res = res
   pool.Req = req
-  callback := func(data string, err error) {
-    fmt.Fprint(res, data)
+  pool.Params = mux.Vars(req)
+  callback := func(resp Response) {
+    json_response, _ := json.Marshal(resp)
+    fmt.Fprint(res, string(json_response))
   }
   pool.handleAction(callback)
 }
 
-func (pool PoolAPI) handleAction(callback func(data string, err error)) {
-  vars := mux.Vars(pool.Req)
-  action := vars["action"]
-  switch action {
-  case "create":
-    data, err := pool.create()
-    callback(data, err)
+func (pool PoolAPI) handleAction(callback func(resp Response)) {
+  action := pool.Params["action"]
+  switch {
+  case action == create && pool.Req.Method == put:
+    resp := pool.create()
+    callback(resp)
   }
 }
 
-// TODO: Consider methods POST, PUT, etc
-func (pool PoolAPI) create() (data string, err error) {
-  data = "creating..."
-  err = nil
+func (pool PoolAPI) create() (resp Response) {
+  poolName := pool.Req.URL.Query().Get("pool")
+  err := ceph.CreatePool(poolName)
+  if err != nil {
+    resp.Status = err.Error()
+  } else {
+    resp.Status = "pool '" + poolName + "' created."
+  }
+  resp.Output = []string{}
   return
 }
 
