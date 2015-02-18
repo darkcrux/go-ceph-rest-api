@@ -1,68 +1,71 @@
 package main
 
 import (
-  "fmt"
-  "net/http"
-  "github.com/gorilla/mux"
-  "encoding/json"
+	"fmt"
+
+	"net/http"
+
+	"encoding/json"
+	"github.com/gorilla/mux"
 )
 
 const (
-  // actions
-  create = "create"
-  // get = "get"
-  // delete = "delete"
+	// actions
+	create = "create"
+	// get = "get"
+	// delete = "delete"
 
-  // methods
-  // get = "GET"
-  // post = "POST"
-  put = "PUT"
-  // delete = "DELETE"
+	// methods
+	// get = "GET"
+	// post = "POST"
+	put = "PUT"
+	// delete = "DELETE"
 )
 
-type PoolAPI struct {
-  Res http.ResponseWriter
-  Req *http.Request
-  Params map[string]string
+type poolAPI struct {
+	Res    http.ResponseWriter
+	Req    *http.Request
+	Params map[string]string
 }
 
 type Response struct {
-  Status string      `json:"status"`
-  Output interface{} `json:"output"`
+	Status string      `json:"status"`
+	Output interface{} `json:"output"`
 }
 
 func poolHandler(res http.ResponseWriter, req *http.Request) {
-  res.WriteHeader(200)
-  var pool PoolAPI
-  pool.Res = res
-  pool.Req = req
-  pool.Params = mux.Vars(req)
-  callback := func(resp Response) {
-    json_response, _ := json.Marshal(resp)
-    fmt.Fprint(res, string(json_response))
-  }
-  pool.handleAction(callback)
+	pool := poolAPI{res, req, mux.Vars(req)}
+	callback := func(resp Response) {
+		json_response, _ := json.Marshal(resp)
+		fmt.Fprint(res, string(json_response))
+	}
+	pool.handlePut(callback)
+	// pool.handlePost(callback)
+	// pool.handleGet(callback)
+	// pool.handleDelete(callback)
 }
 
-func (pool PoolAPI) handleAction(callback func(resp Response)) {
-  action := pool.Params["action"]
-  switch {
-  case action == create && pool.Req.Method == put:
-    resp := pool.create()
-    callback(resp)
-  }
+func (pool poolAPI) handlePut(callback func(resp Response)) {
+	if action := pool.Params["action"]; pool.Req.Method == put {
+		switch action {
+		case create:
+			resp := pool.create()
+			callback(resp)
+		}
+	}
 }
 
-func (pool PoolAPI) create() (resp Response) {
-  poolName := pool.Req.URL.Query().Get("pool")
-  err := ceph.CreatePool(poolName)
-  if err != nil {
-    resp.Status = err.Error()
-  } else {
-    resp.Status = "pool '" + poolName + "' created."
-  }
-  resp.Output = []string{}
-  return
+func (pool poolAPI) create() (resp Response) {
+	poolName := pool.Req.URL.Query().Get("pool")
+	if err := ceph.CreatePool(poolName); err != nil {
+		resp.Status = err.Error()
+		pool.Res.WriteHeader(400)
+	} else {
+		resp.Status = fmt.Sprintf("pool '%s' created.", poolName)
+		pool.Res.WriteHeader(201)
+	}
+	resp.Output = []string{}
+	return
 }
 
 // add other CRUD methods here...

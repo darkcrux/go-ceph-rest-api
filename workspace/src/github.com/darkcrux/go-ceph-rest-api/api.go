@@ -21,7 +21,7 @@ var (
 	// using a map for routes and functions...
 	// this may change if it doesn't work for other impl.
 	routes = map[string]func(res http.ResponseWriter, req *http.Request){
-		uriRoot + "/fsid": fsidHandler,
+		uriRoot + "/fsid":              fsidHandler,
 		uriRoot + "/osd/pool/{action}": poolHandler,
 	}
 )
