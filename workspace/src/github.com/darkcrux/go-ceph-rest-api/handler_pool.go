@@ -43,17 +43,16 @@ func poolHandler(res http.ResponseWriter, req *http.Request) {
 	}
 
 	switch req.Method {
-	default:
-		res.WriteHeader(204)               // Default; No Content
-		fmt.Fprint(res, "204: No Content") // Will replace this later
 	case MethodPut:
 		pool.handlePut(callback)
-		// case MethodPost:
-		// 	pool.handlePost(callback)
-		// case MethodGet:
-		// 	pool.handleGet(callback)
-		// case MethodDelete:
-		// 	pool.handleDelete(callback)
+	// case MethodPost:
+	// 	pool.handlePost(callback)
+	// case MethodGet:
+	// 	pool.handleGet(callback)
+	// case MethodDelete:
+	// 	pool.handleDelete(callback)
+	default:
+		res.WriteHeader(204) // Default; No Content
 	}
 }
 
