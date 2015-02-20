@@ -12,11 +12,11 @@ import (
 const (
 	// actions
 	ActionCreate = "create"
-	// ActionGet = "get"
+	ActionGet    = "get"
 	// ActionDelete = "delete"
 
 	// methods
-	// MethodGet = "GET"
+	MethodGet = "GET"
 	// MethodPost = "POST"
 	MethodPut = "PUT"
 	// MethodDelete = "DELETE"
@@ -47,8 +47,8 @@ func poolHandler(res http.ResponseWriter, req *http.Request) {
 		pool.handlePut(callback)
 	// case MethodPost:
 	// 	pool.handlePost(callback)
-	// case MethodGet:
-	// 	pool.handleGet(callback)
+	case MethodGet:
+		pool.handleGet(callback)
 	// case MethodDelete:
 	// 	pool.handleDelete(callback)
 	default:
@@ -64,6 +64,14 @@ func (pool poolAPI) handlePut(callback func(resp Response)) {
 	}
 }
 
+func (pool poolAPI) handleGet(callback func(resp Response)) {
+	switch pool.Params["action"] {
+	case ActionGet:
+		resp := pool.get()
+		callback(resp)
+	}
+}
+
 func (pool poolAPI) create() (resp Response) {
 	poolName := pool.Req.URL.Query().Get("pool")
 	if err := ceph.CreatePool(poolName); err != nil {
@@ -74,6 +82,15 @@ func (pool poolAPI) create() (resp Response) {
 		resp.Code = 201
 	}
 	resp.Output = []string{}
+	return
+}
+
+func (request poolAPI) get() (resp Response) {
+	poolName := request.Req.URL.Query().Get("pool")
+	pool, _ := ceph.ManagePool(poolName)
+	// TODO: get pool <var>
+	pool.Close()
+
 	return
 }
 
