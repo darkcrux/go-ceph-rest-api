@@ -27,7 +27,8 @@ _testmain.go
 
 *.vdi
 
-/workspace/src/github.com/darkcrux/go-ceph-rest-api/go-ceph-rest-api
+/workspace/src/github.com/darkcrux/go-ceph-rest-api/build
 /workspace/src/github.com/AcalephStorage
 /workspace/src/github.com/gorilla
-
+/workspace/bin
+/workspace/pkg
