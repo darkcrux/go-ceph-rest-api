@@ -29,8 +29,7 @@ Building the binary is done inside the VM.
 ```
 $ vagrant ssh
 $ cd /vagrant/workspace/src/github.com/darkcrux/go-ceph-rest-api
-$ go get
-$ go build
+$ make install
 ```
 
 ## Running the API
@@ -38,7 +37,7 @@ $ go build
 At the moment, the binary will use the default ceph configuration. This needs to be updated in the future, but for now, run the app as su:
 
 ```
-$ sudo ./go-ceph-rest-api
+$ sudo go-ceph-rest-api
 ```
 
 Once running, the API should be accessible via port 9000 (Needs to be updated).
@@ -47,10 +46,14 @@ Once running, the API should be accessible via port 9000 (Needs to be updated).
 $ curl http://200.200.200.200:9000/api/v0.1/fsid
 ```
 
+## Building Docker Image
+
+```
+docker build -t darkcrux/go-ceph-rest-api .
+```
+
 ## Notes
 
 Plenty of things to do:
-- Create Makefile for the project
-- Cross-compilation support
 - Configuration options
 - ???
